@@ -224,6 +224,9 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     async_when_setup_or_start(hass, "frontend", start_server)
 
     hass.http = server
+    
+    # Register HelloWorldView
+    server.register_view(HelloWorldView)
 
     local_ip = await async_get_source_ip(hass)
 
@@ -342,6 +345,7 @@ class HomeAssistantHTTP:
     ) -> None:
         """Initialize the server."""
         self.app[KEY_HASS] = self.hass
+        
 
         # Order matters, security filters middleware needs to go first,
         # forwarded middleware needs to go second.
@@ -621,3 +625,16 @@ class FastUrlDispatcher(UrlDispatcher):
 
         # Finally, fallback to the linear search
         return await super().resolve(request)
+
+
+
+
+class HelloWorldView(HomeAssistantView):
+    """A view that returns 'Hello, World!'."""
+    
+    url = "/api/helloworld"
+    name = "api:helloworld"
+    
+    async def get(self, request):
+        """Handle GET request."""
+        return web.Response(text="Hello, World!")
